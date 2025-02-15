@@ -1,4 +1,4 @@
-# a method to calculate a truncated taylor polynomial for the lorenz system given the parameter values and the start condiions
+# a C++ method to calculate a truncated taylor polynomial for the lorenz system given the parameter values and the start conditions
 
 
 **Author**: Peter Foelsche |
