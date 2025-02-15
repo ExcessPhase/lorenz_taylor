@@ -155,16 +155,16 @@ enum enumIndependent
 };
 struct z
 {	struct derivative
-	{	typedef subtraction<
-			multiplication<
+	{	typedef typename subtraction<
+			typename multiplication<
 				x,
 				y
-			>,
-			multiplication<
+			>::type,
+			typename multiplication<
 				beta,
 				z
-			>
-		> type;
+			>::type
+		>::type type;
 	};
 	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
 	{	return _rI.at(eZ);
@@ -172,13 +172,13 @@ struct z
 };
 struct y
 {	struct derivative
-	{	typedef subtraction<
-			multiplication<
+	{	typedef typename subtraction<
+			typename multiplication<
 				x,
-				subtraction<rho, z>
-			>,
+				typename subtraction<rho, z>::type
+			>::type,
 			y
-		> type;
+		>::type type;
 	};
 	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
 	{	return _rI.at(eY);
@@ -186,10 +186,10 @@ struct y
 };
 struct x
 {	struct derivative
-	{	typedef multiplication<
+	{	typedef typename multiplication<
 			sigma,
-			subtraction<y, x>
-		> type;
+			typename subtraction<y, x>::type
+		>::type type;
 	};
 	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
 	{	return _rI.at(eX);
@@ -202,20 +202,34 @@ std::size_t factorial(const std::size_t _i)
 		return 1;
 }
 template<typename X, std::size_t ORDER>
-void call(void)
+void call(const std::vector<double> &_rI, const std::vector<double> &_rP)
 {	if constexpr (ORDER > 0)
-		call<X, ORDER-1>();
-	const std::vector<double> sP({10.0, 28.0, 8.0/3.0});
-	const std::vector<double> sI({0.9, 0.0, 0.0});
-	std::cout << typename derive<X, ORDER>::type()(sI, sP)/factorial(ORDER) << std::endl;
+		call<X, ORDER-1>(_rI, _rP);
+	std::cout << typename derive<X, ORDER>::type()(_rI, _rP)/factorial(ORDER) << std::endl;
 }
 }
 int main(int argc, char**argv)
-{	using namespace peter;
-	call<peter::x, 3>();
+{	if (argc != 7)
+	{	std::cerr << argv[0] << ": Usage: " << argv[0] << "sigma rho beta x y z" << std::endl;
+		return 1;
+	}
+	const std::vector<double> sP(
+		{	std::atof(argv[1]),
+			std::atof(argv[2]),
+			std::atof(argv[3])
+		}
+	); 
+	const std::vector<double> sI(
+		{	std::atof(argv[4]),
+			std::atof(argv[5]),
+			std::atof(argv[6])
+		}
+	); 
+	using namespace peter;
+	call<peter::x, 3>(sI, sP);
 	std::cout << std::endl;
-	call<peter::y, 3>();
+	call<peter::y, 3>(sI, sP);
 	std::cout << std::endl;
-	call<peter::z, 3>();
+	call<peter::z, 3>(sI, sP);
 }
 
