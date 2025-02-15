@@ -5,17 +5,6 @@
 
 namespace peter
 {
-#if 0
-template<unsigned char VAR, unsigned int ORDER>
-struct independentVariable
-{	struct derivative
-	{	typedef independentVariable<VAR, ORDER+1> type;
-	};
-	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&) const
-	{	return _rI.at(VAR).at(ORDER);
-	}
-};
-#endif
 struct zero
 {	struct derivative
 	{	typedef zero type;
