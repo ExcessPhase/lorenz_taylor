@@ -5,6 +5,8 @@
 
 namespace peter
 {
+template<typename L, typename R>
+struct subtraction;
 /// a zero value
 struct zero
 {	struct derivative
@@ -94,6 +96,10 @@ template<typename L>
 struct addition<zero, L>
 {	typedef L type;
 };
+template<typename L, typename R>
+struct addition<L, negate<R> >
+{	typedef typename subtraction<L, R>::type type;
+};
 /// binary minus
 template<typename L, typename R>
 struct subtraction
@@ -153,6 +159,19 @@ struct multiplication<L, zero>
 template<typename L>
 struct multiplication<zero, L>
 {	typedef zero type;
+};
+template<typename L, typename R>
+struct multiplication<L, negate<R> >
+{	typedef typename negate<
+		typename multiplication<L, R>::type
+	>::type type;
+};
+/// 0*L == 0
+template<typename L, typename R>
+struct multiplication<negate<L>, R>
+{	typedef typename negate<
+		typename multiplication<L, R>::type
+	>::type type;
 };
 /// the parameters
 typedef parameter<eSigma> sigma;
