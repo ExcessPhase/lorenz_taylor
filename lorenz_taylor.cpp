@@ -13,6 +13,9 @@ struct zero
 	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&) const
 	{	return 0.0;
 	}
+	friend std::ostream &operator<<(std::ostream &_rS, const zero&)
+	{	return _rS << "0";
+	}
 };
 /// a unary negative sign
 template<typename T>
@@ -26,6 +29,9 @@ struct negate
 	{	return -T()(_rI, _rP);
 	}
 	typedef negate type;
+	friend std::ostream &operator<<(std::ostream &_rS, const negate<T>&)
+	{	return _rS << "(-(" << T() << "))";
+	}
 };
 /// -0 == 0
 template<>
@@ -46,6 +52,18 @@ struct parameter
 	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&_rP) const
 	{	return _rP.at(VAR);
 	}
+	friend std::ostream &operator<<(std::ostream &_rS, const parameter<VAR>&)
+	{	switch (VAR)
+		{	default:
+				return _rS << "parameter<" << VAR << ">";
+			case eSigma:
+				return _rS << "sigma";
+			case eRho:
+				return _rS << "rho";
+			case eBeta:
+				return _rS << "beta";
+		}
+	}
 };
 template<typename L, typename R>
 struct multiplication;
@@ -62,6 +80,9 @@ struct addition
 	{	return L()(_rI, _rP) + R()(_rI, _rP);
 	}
 	typedef addition type;
+	friend std::ostream &operator<<(std::ostream &_rS, const addition<L, R>&)
+	{	return _rS << "(" << L() << ")+(" << R() << ")";
+	}
 };
 /// L + 0 == L
 template<typename L>
@@ -86,6 +107,9 @@ struct subtraction
 	{	return L()(_rI, _rP) - R()(_rI, _rP);
 	}
 	typedef subtraction type;
+	friend std::ostream &operator<<(std::ostream &_rS, const subtraction<L, R>&)
+	{	return _rS << "(" << L() << ")-(" << R() << ")";
+	}
 };
 /// L - 0 == L
 template<typename L>
@@ -116,6 +140,9 @@ struct multiplication
 	{	return L()(_rI, _rP) * R()(_rI, _rP);
 	}
 	typedef multiplication type;
+	friend std::ostream &operator<<(std::ostream &_rS, const multiplication<L, R>&)
+	{	return _rS << "(" << L() << ")*(" << R() << ")";
+	}
 };
 /// L*0 == 0
 template<typename L>
@@ -151,6 +178,18 @@ struct X
 	};
 	double operator()(const std::vector<std::vector<double> >&_rI, const std::vector<double>&) const
 	{	return _rI.at(VAR).at(ORDER);
+	}
+	friend std::ostream &operator<<(std::ostream &_rS, const X<VAR, ORDER>&)
+	{	switch (VAR)
+		{	default:
+				return _rS << "X<" << VAR << ", " << int(ORDER) << ">";
+			case eX:
+				return _rS << "X<" << int(ORDER) << ">";
+			case eY:
+				return _rS << "Y<" << int(ORDER) << ">";
+			case eZ:
+				return _rS << "Z<" << int(ORDER) << ">";
+		}
 	}
 };
 /// independent variable x
@@ -202,7 +241,10 @@ std::size_t factorial(const std::size_t _i)
 /// calculation of values of derivative
 template<typename X, typename Y, typename Z, std::size_t ORDERM1, std::size_t ORDER>
 void calculate(std::vector<std::vector<double> >&_rI, const std::vector<double> &_rP)
-{	_rI.at(eX).at(ORDER - ORDERM1) = X()(_rI, _rP);
+{	std::cout << "X<" << ORDER - ORDERM1 << ">=" << X() << std::endl;
+	std::cout << "Y<" << ORDER - ORDERM1 << ">=" << Y() << std::endl;
+	std::cout << "Z<" << ORDER - ORDERM1 << ">=" << Z() << std::endl;
+	_rI.at(eX).at(ORDER - ORDERM1) = X()(_rI, _rP);
 	_rI.at(eY).at(ORDER - ORDERM1) = Y()(_rI, _rP);
 	_rI.at(eZ).at(ORDER - ORDERM1) = Z()(_rI, _rP);
 	if constexpr (ORDERM1 > 1)
