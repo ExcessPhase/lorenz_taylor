@@ -30,7 +30,7 @@ struct negate
 	}
 	typedef negate type;
 	friend std::ostream &operator<<(std::ostream &_rS, const negate<T>&)
-	{	return _rS << "(-(" << T() << "))";
+	{	return _rS << "(-" << T() << ")";
 	}
 };
 /// -0 == 0
@@ -81,7 +81,7 @@ struct addition
 	}
 	typedef addition type;
 	friend std::ostream &operator<<(std::ostream &_rS, const addition<L, R>&)
-	{	return _rS << "(" << L() << ")+(" << R() << ")";
+	{	return _rS << "(" << L() << "+" << R() << ")";
 	}
 };
 /// L + 0 == L
@@ -108,7 +108,7 @@ struct subtraction
 	}
 	typedef subtraction type;
 	friend std::ostream &operator<<(std::ostream &_rS, const subtraction<L, R>&)
-	{	return _rS << "(" << L() << ")-(" << R() << ")";
+	{	return _rS << "(" << L() << "-" << R() << ")";
 	}
 };
 /// L - 0 == L
@@ -141,7 +141,7 @@ struct multiplication
 	}
 	typedef multiplication type;
 	friend std::ostream &operator<<(std::ostream &_rS, const multiplication<L, R>&)
-	{	return _rS << "(" << L() << ")*(" << R() << ")";
+	{	return _rS << "(" << L() << "*" << R() << ")";
 	}
 };
 /// L*0 == 0
