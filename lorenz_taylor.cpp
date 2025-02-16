@@ -9,7 +9,7 @@ struct zero
 {	struct derivative
 	{	typedef zero type;
 	};
-	double operator()(const std::vector<double>&, const std::vector<double>&) const
+	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&) const
 	{	return 0.0;
 	}
 };
@@ -20,7 +20,7 @@ struct negate
 			typename T::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<double>&_rI, const std::vector<double>&_rP) const
+	double operator()(const std::vector<std::vector<double> >&_rI, const std::vector<double>&_rP) const
 	{	return -T()(_rI, _rP);
 	}
 	typedef negate type;
@@ -29,12 +29,17 @@ template<>
 struct negate<zero>
 {	typedef zero type;
 };
-template<unsigned char VAR>
+enum enumParameter
+{	eSigma,
+	eRho,
+	eBeta
+};
+template<enumParameter VAR>
 struct parameter
 {	struct derivative
 	{	typedef zero type;
 	};
-	double operator()(const std::vector<double>&, const std::vector<double>&_rP) const
+	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&_rP) const
 	{	return _rP.at(VAR);
 	}
 };
@@ -48,7 +53,7 @@ struct addition
 			typename R::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&_rP) const
+	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) + R()(_rI, _rP);
 	}
 	typedef addition type;
@@ -69,7 +74,7 @@ struct subtraction
 			typename R::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&_rP) const
+	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) - R()(_rI, _rP);
 	}
 	typedef subtraction type;
@@ -96,7 +101,7 @@ struct multiplication
 			>::type
 		>::type type;
 	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&_rP) const
+	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) * R()(_rI, _rP);
 	}
 	typedef multiplication type;
@@ -117,11 +122,6 @@ template<typename T>
 struct derive<T, 0>
 {	typedef T type;
 };
-enum enumParameter
-{	eSigma,
-	eRho,
-	eBeta
-};
 typedef parameter<eSigma> sigma;
 typedef parameter<eRho> rho;
 typedef parameter<eBeta> beta;
@@ -132,57 +132,52 @@ dy/dt = x * (rho - z) - y
 
 dz/dt = x * y - beta * z
 #endif
-struct x;
-struct y;
-struct z;
-
-
 enum enumIndependent
 {	eX,
 	eY,
 	eZ
 };
-struct z
+template<enumIndependent VAR, unsigned char ORDER>
+struct X
 {	struct derivative
-	{	typedef typename subtraction<
-			typename multiplication<
-				x,
-				y
-			>::type,
-			typename multiplication<
-				beta,
-				z
-			>::type
-		>::type type;
+	{	typedef X<VAR, ORDER+1> type;
 	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
-	{	return _rI.at(eZ);
+	double operator()(const std::vector<std::vector<double> >&_rI, const std::vector<double>&) const
+	{	return _rI.at(VAR).at(ORDER);
 	}
 };
-struct y
-{	struct derivative
-	{	typedef typename subtraction<
-			typename multiplication<
-				x,
-				typename subtraction<rho, z>::type
-			>::type,
-			y
-		>::type type;
-	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
-	{	return _rI.at(eY);
-	}
-};
-struct x
+struct x:X<eX, 0>
 {	struct derivative
 	{	typedef typename multiplication<
 			sigma,
-			typename subtraction<y, x>::type
+			typename subtraction<X<eY, 0>, X<eX, 0>>::type
 		>::type type;
 	};
-	double operator()(const std::vector<double>& _rI, const std::vector<double>&) const
-	{	return _rI.at(eX);
-	}
+};
+struct y:X<eY, 0>
+{	struct derivative
+	{	typedef typename subtraction<
+			typename multiplication<
+				X<eX, 0>,
+				typename subtraction<rho, X<eZ, 0>>::type
+			>::type,
+			X<eY, 0>
+		>::type type;
+	};
+};
+struct z:X<eZ, 0>
+{	struct derivative
+	{	typedef typename subtraction<
+			typename multiplication<
+				X<eX, 0>,
+				X<eY, 0>
+			>::type,
+			typename multiplication<
+				beta,
+				X<eZ, 0>
+			>::type
+		>::type type;
+	};
 };
 std::size_t factorial(const std::size_t _i)
 {	if (_i)
@@ -190,11 +185,13 @@ std::size_t factorial(const std::size_t _i)
 	else
 		return 1;
 }
-template<typename X, std::size_t ORDER>
-void call(const std::vector<double> &_rI, const std::vector<double> &_rP)
+template<typename X, typename Y, typename Z, std::size_t ORDER>
+void call(std::vector<std::vector<double> >&_rI, const std::vector<double> &_rP)
 {	if constexpr (ORDER > 0)
-		call<X, ORDER-1>(_rI, _rP);
-	std::cout << typename derive<X, ORDER>::type()(_rI, _rP)/factorial(ORDER) << std::endl;
+		call<X, Y, Z, ORDER-1>(_rI, _rP);
+	_rI.at(eX).at(ORDER) = typename derive<X, ORDER>::type()(_rI, _rP);
+	_rI.at(eY).at(ORDER) = typename derive<Y, ORDER>::type()(_rI, _rP);
+	_rI.at(eZ).at(ORDER) = typename derive<Z, ORDER>::type()(_rI, _rP);
 }
 }
 int main(int argc, char**argv)
@@ -202,23 +199,23 @@ int main(int argc, char**argv)
 	{	std::cerr << argv[0] << ": Usage: " << argv[0] << "sigma rho beta x y z" << std::endl;
 		return 1;
 	}
+	static constexpr std::size_t ORDER = 4;
 	const std::vector<double> sP(
 		{	std::atof(argv[1]),
 			std::atof(argv[2]),
 			std::atof(argv[3])
 		}
 	); 
-	const std::vector<double> sI(
-		{	std::atof(argv[4]),
-			std::atof(argv[5]),
-			std::atof(argv[6])
+	std::vector<std::vector<double> > sI(
+		{	std::vector<double>(ORDER, std::atof(argv[4])),
+			std::vector<double>(ORDER, std::atof(argv[5])),
+			std::vector<double>(ORDER, std::atof(argv[6]))
 		}
 	); 
 	using namespace peter;
-	call<peter::x, 3>(sI, sP);
-	std::cout << std::endl;
-	call<peter::y, 3>(sI, sP);
-	std::cout << std::endl;
-	call<peter::z, 3>(sI, sP);
+	call<x, y, z, ORDER-1>(sI, sP);
+	for (auto &r : sI)
+		for (auto &d : r)
+			std::cout << d/factorial(&d - r.data()) << std::endl;
 }
 
