@@ -240,7 +240,9 @@ int main(int argc, char**argv)
 	using namespace peter;
 	calculate<x, y, z, ORDER-1>(sI, sP);
 	for (auto &r : sI)
-		for (auto &d : r)
+	{	for (auto &d : r)
 			std::cout << d/factorial(&d - r.data()) << std::endl;
+		std::cout << std::endl;
+	}
 }
 
