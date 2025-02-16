@@ -20,6 +20,11 @@ The produced coefficients are polynomials in time for `x(t)`, `y(t)` and `z(t)`.
 
 The number of coefficients can be increased by changing the last template parameter for the `calculate()` function, currently being `3` producing `4` coefficients for each variable.
 
+## build
+
+Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_taylor.cpp -DNDEBUG -O3`.
+
+
 ## News
 
 I changed the implementation to avoid repeated calculation of the same values.
