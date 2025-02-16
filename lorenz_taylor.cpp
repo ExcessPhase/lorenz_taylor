@@ -210,13 +210,13 @@ std::size_t factorial(const std::size_t _i)
 		return 1;
 }
 /// calculation of values of derivative
-template<typename X, typename Y, typename Z, std::size_t ORDER>
+template<typename X, typename Y, typename Z, std::size_t ORDERM1, std::size_t ORDER>
 void calculate(std::vector<std::vector<double> >&_rI, const std::vector<double> &_rP)
-{	if constexpr (ORDER > 1)
-		calculate<X, Y, Z, ORDER-1>(_rI, _rP);
-	_rI.at(eX).at(ORDER) = typename derive<X, ORDER>::type()(_rI, _rP);
-	_rI.at(eY).at(ORDER) = typename derive<Y, ORDER>::type()(_rI, _rP);
-	_rI.at(eZ).at(ORDER) = typename derive<Z, ORDER>::type()(_rI, _rP);
+{	_rI.at(eX).at(ORDER - ORDERM1) = X()(_rI, _rP);
+	_rI.at(eY).at(ORDER - ORDERM1) = Y()(_rI, _rP);
+	_rI.at(eZ).at(ORDER - ORDERM1) = Z()(_rI, _rP);
+	if constexpr (ORDERM1 > 1)
+		calculate<typename X::derivative::type, typename Y::derivative::type, typename Z::derivative::type, ORDERM1-1, ORDER>(_rI, _rP);
 }
 }
 int main(int argc, char**argv)
@@ -238,7 +238,7 @@ int main(int argc, char**argv)
 		}
 	);
 	using namespace peter;
-	calculate<x, y, z, ORDER-1>(sI, sP);
+	calculate<typename x::derivative::type, typename y::derivative::type, typename z::derivative::type, ORDER-1, ORDER>(sI, sP);
 	for (auto &r : sI)
 	{	for (auto &d : r)
 			std::cout << d/factorial(&d - r.data()) << std::endl;
