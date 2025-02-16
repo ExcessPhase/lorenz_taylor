@@ -127,16 +127,6 @@ template<typename L>
 struct multiplication<zero, L>
 {	typedef zero type;
 };
-/// recursive application of derive
-template<typename T, std::size_t ORDER>
-struct derive
-{	typedef typename derive<T, ORDER-1>::type::derivative::type type;
-};
-/// termination of recursion
-template<typename T>
-struct derive<T, 0>
-{	typedef T type;
-};
 /// the parameters
 typedef parameter<eSigma> sigma;
 typedef parameter<eRho> rho;
