@@ -18,4 +18,4 @@ This is `sigma`, `rho` and `beta` and `x(t=0)`, `y(t=0)` and `z(t=0)`!
 
 The produced coefficients are polynomials in time for `x(t)`, `y(t)` and `z(t)`.
 
-The number of coefficients can be increased by changing the last template parameter.for the `call()` function, currently being `3` producing `4` coefficients for each variable.
+The number of coefficients can be increased by changing the last template parameter for the `calculate()` function, currently being `3` producing `4` coefficients for each variable.
