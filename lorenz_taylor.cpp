@@ -96,6 +96,7 @@ template<typename L>
 struct addition<zero, L>
 {	typedef L type;
 };
+/// a + (-b) == a - b
 template<typename L, typename R>
 struct addition<L, negate<R> >
 {	typedef typename subtraction<L, R>::type type;
@@ -160,13 +161,14 @@ template<typename L>
 struct multiplication<zero, L>
 {	typedef zero type;
 };
+/// a*(-b) == -(a*b)
 template<typename L, typename R>
 struct multiplication<L, negate<R> >
 {	typedef typename negate<
 		typename multiplication<L, R>::type
 	>::type type;
 };
-/// 0*L == 0
+/// (-a)*b == -(a*b)
 template<typename L, typename R>
 struct multiplication<negate<L>, R>
 {	typedef typename negate<
@@ -251,7 +253,7 @@ struct z:X<eZ, 0>
 	};
 };
 /// recursive implementation of factorial
-std::size_t factorial(const std::size_t _i)
+constexpr std::size_t factorial(const std::size_t _i)
 {	if (_i)
 		return _i*factorial(_i - 1);
 	else
