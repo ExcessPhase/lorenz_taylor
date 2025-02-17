@@ -33,3 +33,7 @@ And I inserted some comments.
 
 I implemented printing out the expressions in order to be able to evaluate them for possible optimizations.
 Some easy optimizations I did already implement -- like `something+0==something`.
+
+## Looking for a job as a C++ Software Engineer
+
+BTW -- if you know some company which is trying to hire a C++ Software Engineer: I'm on the market since some months already!
