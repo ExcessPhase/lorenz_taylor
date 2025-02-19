@@ -55,6 +55,11 @@ The coefficients are 3 sets for `x`, `y`, `z` and they are 4 values each. The va
 
 Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_taylor.cpp -DNDEBUG -O3 -I $BOOST_ROOT/include`.
 I also added a `Makefile`.
+If you do not use either the `Makefile` nor the Visual C++ solution file, you will have to initialize the submodule by hand:
+```
+git submodule init ctaylor
+git submodule update --init --recursive ctaylor
+```
 
 ## News
 
