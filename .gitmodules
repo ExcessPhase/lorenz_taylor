@@ -1,0 +1,3 @@
+[submodule "ctaylor"]
+	path = ctaylor
+	url = https://github.com/ExcessPhase/ctaylor.git

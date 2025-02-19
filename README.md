@@ -26,6 +26,8 @@ Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_tay
 
 ## News
 
+Now this code references my github repoistory [excessphase/ctaylor](https://github.com/ExcessPhase/ctaylor) for calculating the derivative of the taylor coefficients wrt the initial conditions of the state variables.
+
 I changed the implementation to avoid repeated calculation of the same values referring back to previously calculated time derivatives of the system state.
 And I inserted some comments.
 

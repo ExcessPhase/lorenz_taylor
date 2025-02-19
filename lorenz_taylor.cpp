@@ -1,18 +1,26 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-
+#include "ctaylor/cjacobian.h"
 
 namespace peter
 {
 template<typename L, typename R>
 struct subtraction;
+typedef jacobian::cjacobian<
+	boost::mp11::mp_list<
+		boost::mp11::mp_size_t<0>,
+		boost::mp11::mp_size_t<1>,
+		boost::mp11::mp_size_t<2>
+	>
+> result;
+
 /// a zero value
 struct zero
 {	struct derivative
 	{	typedef zero type;
 	};
-	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&) const
+	auto operator()(const std::vector<std::vector<result> >&, const std::vector<double>&) const
 	{	return 0.0;
 	}
 	friend std::ostream &operator<<(std::ostream &_rS, const zero&)
@@ -27,7 +35,7 @@ struct negate
 			typename T::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<std::vector<double> >&_rI, const std::vector<double>&_rP) const
+	auto operator()(const std::vector<std::vector<result> >&_rI, const std::vector<double>&_rP) const
 	{	return -T()(_rI, _rP);
 	}
 	typedef negate type;
@@ -51,7 +59,7 @@ struct parameter
 {	struct derivative
 	{	typedef zero type;
 	};
-	double operator()(const std::vector<std::vector<double> >&, const std::vector<double>&_rP) const
+	auto operator()(const std::vector<std::vector<result> >&, const std::vector<double>&_rP) const
 	{	return _rP.at(VAR);
 	}
 	friend std::ostream &operator<<(std::ostream &_rS, const parameter<VAR>&)
@@ -78,7 +86,7 @@ struct addition
 			typename R::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
+	auto operator()(const std::vector<std::vector<result> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) + R()(_rI, _rP);
 	}
 	typedef addition type;
@@ -110,7 +118,7 @@ struct subtraction
 			typename R::derivative::type
 		>::type type;
 	};
-	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
+	auto operator()(const std::vector<std::vector<result> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) - R()(_rI, _rP);
 	}
 	typedef subtraction type;
@@ -143,7 +151,7 @@ struct multiplication
 			>::type
 		>::type type;
 	};
-	double operator()(const std::vector<std::vector<double> >& _rI, const std::vector<double>&_rP) const
+	auto operator()(const std::vector<std::vector<result> >& _rI, const std::vector<double>&_rP) const
 	{	return L()(_rI, _rP) * R()(_rI, _rP);
 	}
 	typedef multiplication type;
@@ -197,7 +205,7 @@ struct X
 {	struct derivative
 	{	typedef X<VAR, ORDER+1> type;
 	};
-	double operator()(const std::vector<std::vector<double> >&_rI, const std::vector<double>&) const
+	auto operator()(const std::vector<std::vector<result> >&_rI, const std::vector<double>&) const
 	{	return _rI.at(VAR).at(ORDER);
 	}
 	friend std::ostream &operator<<(std::ostream &_rS, const X<VAR, ORDER>&)
@@ -261,7 +269,7 @@ constexpr std::size_t factorial(const std::size_t _i)
 }
 /// calculation of values of derivative
 template<typename X, typename Y, typename Z, std::size_t ORDERM1, std::size_t ORDER>
-void calculate(std::vector<std::vector<double> >&_rI, const std::vector<double> &_rP)
+void calculate(std::vector<std::vector<result> >&_rI, const std::vector<double> &_rP)
 {	std::cout << "X<" << ORDER - ORDERM1 << ">=" << X() << std::endl;
 	std::cout << "Y<" << ORDER - ORDERM1 << ">=" << Y() << std::endl;
 	std::cout << "Z<" << ORDER - ORDERM1 << ">=" << Z() << std::endl;
@@ -284,13 +292,14 @@ int main(int argc, char**argv)
 			std::atof(argv[3])
 		}
 	);
-	std::vector<std::vector<double> > sI(
-		{	std::vector<double>(ORDER, std::atof(argv[4])),
-			std::vector<double>(ORDER, std::atof(argv[5])),
-			std::vector<double>(ORDER, std::atof(argv[6]))
+	using namespace boost::mp11;
+	using namespace peter;
+	std::vector<std::vector<result> > sI(
+		{	std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<0> > >(std::atof(argv[4]), true)),
+			std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<1> > >(std::atof(argv[5]), true)),
+			std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<2> > >(std::atof(argv[6]), true))
 		}
 	);
-	using namespace peter;
 	calculate<typename x::derivative::type, typename y::derivative::type, typename z::derivative::type, ORDER-1, ORDER>(sI, sP);
 	for (auto &r : sI)
 	{	for (auto &d : r)
