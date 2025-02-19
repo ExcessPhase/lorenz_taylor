@@ -21,7 +21,7 @@ The produced coefficients are polynomials in time for `x(t)`, `y(t)` and `z(t)`.
 The number of coefficients can be changed by changing the constant `ORDER`. The first coefficient for every variable is obviously identical to the starting conditions passed in via the command-line.
 
 The output for the above commandline is now the following:
-`
+```
 peter@M4700:~/lorenz_taylor$ ./lorentz_taylor.exe 10 28 2.66666666 0.9 0 0
 X<1>=(sigma*(Y<0>-X<0>))
 Y<1>=((X<0>*(rho-Z<0>))-Y<0>)
@@ -48,7 +48,7 @@ Z<3>=((((X<2>*Y<0>)+(X<1>*Y<1>))+((X<1>*Y<1>)+(X<0>*Y<2>)))-(beta*Z<2>))
 (-127.26, d/dX0=-282.8, d/dX1=191.495, d/dX2=1.74451)
 
 peter@M4700:~/lorenz_taylor$
-`
+```
 
 The coefficients are 3 sets for `x`, `y`, `z` and they are 4 values each. The value is the first value after the opening parenthesis and the labled values following are derivatives wrt the initial conditions specified.
 ## build
