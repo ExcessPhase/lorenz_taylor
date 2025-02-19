@@ -26,7 +26,7 @@ Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_tay
 
 ## News
 
-Now this code references my github repository [excessphase/ctaylor](https://github.com/ExcessPhase/ctaylor) for calculating the derivative of the taylor coefficients wrt the initial conditions of the state variables. This requires one to execute the following command from inside the `lorenz_taylor` directory: `git clone --recurse-submodules ctaylor`
+Now this code references my github repository [excessphase/ctaylor](https://github.com/ExcessPhase/ctaylor) for calculating the derivative of the taylor coefficients wrt the initial conditions of the state variables. This requires one to execute the following command from inside the `lorenz_taylor` directory: `git clone --recurse-submodules git@github.com:ExcessPhase/ctaylor.git`
 
 
 I changed the implementation to avoid repeated calculation of the same values referring back to previously calculated time derivatives of the system state.
