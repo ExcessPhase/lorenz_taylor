@@ -23,6 +23,7 @@ The number of coefficients can be increased by changing the last template parame
 ## build
 
 Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_taylor.cpp -DNDEBUG -O3 -I $BOOST_ROOT/include`.
+I also added a `Makefile`.
 
 ## News
 
