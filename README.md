@@ -18,7 +18,7 @@ This is `sigma`, `rho` and `beta` and `x(t=0)`, `y(t=0)` and `z(t=0)`!
 
 The produced coefficients are polynomials in time for `x(t)`, `y(t)` and `z(t)`.
 
-The number of coefficients can be changed by changing the constant `ORDER`. The first coefficient for every variable is obviously identical to the starting conditions passed in via the command-line.
+The number of coefficients can be changed by changing the constant `MAX_ORDER`. The first coefficient for every variable (`X`, `Y`, `Z`) is obviously identical to the starting conditions passed in via the command-line.
 
 The output for the above commandline is now the following:
 ```
@@ -50,7 +50,7 @@ Z<3>=((((X<2>*Y<0>)+(X<1>*Y<1>))+((X<1>*Y<1>)+(X<0>*Y<2>)))-(beta*Z<2>))
 peter@M4700:~/lorenz_taylor$
 ```
 
-The coefficients are 3 sets for `x`, `y`, `z` and they are 4 values each. The value is the first value after the opening parenthesis and the labled values following are derivatives wrt the initial conditions specified.
+The coefficients are 3 sets for `x`, `y`, `z` and they are 4 values each (`MAX_ORDER` + 1). The value is the first value after the opening parenthesis and the labled values following are derivatives wrt the initial conditions specified.
 ## build
 
 Use the included Visual C++ project file or simply do `g++ -std=c++17 lorenz_taylor.cpp -DNDEBUG -O3 -I $BOOST_ROOT/include`.
