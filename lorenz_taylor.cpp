@@ -7,6 +7,10 @@ namespace peter
 {
 template<typename L, typename R>
 struct subtraction;
+#if 1
+/// the AD type used to calculate the derivatives of the calculated coefficients
+/// wrt the initial conditions
+/// If you do not care about this functionality, replace the #if 1 above with #if 0
 typedef jacobian::cjacobian<
 	boost::mp11::mp_list<
 		boost::mp11::mp_size_t<0>,
@@ -14,6 +18,19 @@ typedef jacobian::cjacobian<
 		boost::mp11::mp_size_t<2>
 	>
 > result;
+template<std::size_t ENUM>
+static result makeIndependent(const double _d)
+{	using namespace boost::mp11;
+	return jacobian::cjacobian<mp_list<mp_size_t<ENUM> > >(_d, true);
+}
+#else
+/// calculate plain double coefficients
+typedef double result;
+template<std::size_t>
+static result makeIndependent(const double _d)
+{	return _d;
+}
+#endif
 
 /// a zero value
 struct zero
@@ -268,16 +285,16 @@ constexpr std::size_t factorial(const std::size_t _i)
 		return 1;
 }
 /// calculation of values of derivative
-template<typename X, typename Y, typename Z, std::size_t ORDERM1, std::size_t ORDER>
+template<typename X, typename Y, typename Z, std::size_t ORDER, std::size_t MAX_ORDER>
 void calculate(std::vector<std::vector<result> >&_rI, const std::vector<double> &_rP)
-{	std::cout << "X<" << ORDER - ORDERM1 << ">=" << X() << std::endl;
-	std::cout << "Y<" << ORDER - ORDERM1 << ">=" << Y() << std::endl;
-	std::cout << "Z<" << ORDER - ORDERM1 << ">=" << Z() << std::endl;
-	_rI.at(eX).at(ORDER - ORDERM1) = X()(_rI, _rP);
-	_rI.at(eY).at(ORDER - ORDERM1) = Y()(_rI, _rP);
-	_rI.at(eZ).at(ORDER - ORDERM1) = Z()(_rI, _rP);
-	if constexpr (ORDERM1 > 1)
-		calculate<typename X::derivative::type, typename Y::derivative::type, typename Z::derivative::type, ORDERM1-1, ORDER>(_rI, _rP);
+{	std::cout << "X<" << ORDER << ">=" << X() << std::endl;
+	std::cout << "Y<" << ORDER << ">=" << Y() << std::endl;
+	std::cout << "Z<" << ORDER << ">=" << Z() << std::endl;
+	_rI.at(eX).at(ORDER) = X()(_rI, _rP);
+	_rI.at(eY).at(ORDER) = Y()(_rI, _rP);
+	_rI.at(eZ).at(ORDER) = Z()(_rI, _rP);
+	if constexpr(ORDER < MAX_ORDER)
+		calculate<typename X::derivative::type, typename Y::derivative::type, typename Z::derivative::type, ORDER + 1, MAX_ORDER>(_rI, _rP);
 }
 }
 int main(int argc, char**argv)
@@ -285,22 +302,22 @@ int main(int argc, char**argv)
 	{	std::cerr << argv[0] << ": Usage: " << argv[0] << "sigma rho beta x y z" << std::endl;
 		return 1;
 	}
-	static constexpr std::size_t ORDER = 4;
 	const std::vector<double> sP(
 		{	std::atof(argv[1]),
 			std::atof(argv[2]),
 			std::atof(argv[3])
 		}
 	);
-	using namespace boost::mp11;
+	//using namespace boost::mp11;
 	using namespace peter;
+	static constexpr std::size_t MAX_ORDER = 3;
 	std::vector<std::vector<result> > sI(
-		{	std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<0> > >(std::atof(argv[4]), true)),
-			std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<1> > >(std::atof(argv[5]), true)),
-			std::vector<result>(ORDER, jacobian::cjacobian<mp_list<mp_size_t<2> > >(std::atof(argv[6]), true))
+		{	std::vector<result>(MAX_ORDER + 1, makeIndependent<0>(std::atof(argv[4]))),
+			std::vector<result>(MAX_ORDER + 1, makeIndependent<1>(std::atof(argv[5]))),
+			std::vector<result>(MAX_ORDER + 1, makeIndependent<2>(std::atof(argv[6])))
 		}
 	);
-	calculate<typename x::derivative::type, typename y::derivative::type, typename z::derivative::type, ORDER-1, ORDER>(sI, sP);
+	calculate<typename x::derivative::type, typename y::derivative::type, typename z::derivative::type, 1, MAX_ORDER>(sI, sP);
 	for (auto &r : sI)
 	{	for (auto &d : r)
 			std::cout << d/factorial(&d - r.data()) << std::endl;
