@@ -299,7 +299,7 @@ void calculate(std::vector<std::vector<result> >&_rI, const std::vector<double> 
 }
 int main(int argc, char**argv)
 {	if (argc != 7)
-	{	std::cerr << argv[0] << ": Usage: " << argv[0] << "sigma rho beta x y z" << std::endl;
+	{	std::cerr << argv[0] << ": Usage: " << argv[0] << ": sigma rho beta x y z" << std::endl;
 		return 1;
 	}
 	const std::vector<double> sP(
